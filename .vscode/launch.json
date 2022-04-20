@@ -1,0 +1,90 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "J-Link (internal)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "executable": "build/template.elf",
+            "servertype": "jlink",
+            "device": "M487JIDAE",
+            "preLaunchCommands": [
+                "set mem inaccessible-by-default off",
+            ],
+
+            "preRestartCommands": [
+                "monitor reset 0"
+            ],
+            "svdFile": "M481_v1.svd",
+            "preLaunchTask": "Build", // Set this to run a task from tasks.json before starting a debug session
+            "showDevDebugOutput":"none",// Shows output of GDB, helpful when something is not working right
+        },
+        {
+            "name": "J-Link (external)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "executable": "build/template.elf",
+            "servertype": "external",
+            "gdbTarget": "localhost:2331",
+            "preLaunchCommands": [
+                "set mem inaccessible-by-default off",
+                "monitor reset 0"
+            ],
+            "postLaunchCommands": [
+                "monitor reset",
+            ],
+            "preRestartCommands": [
+                "monitor reset 0"
+            ],
+            "svdFile": "M481_v1.svd",
+            "preLaunchTask": "Build", // Set this to run a task from tasks.json before starting a debug session
+            "showDevDebugOutput":"none",// Shows output of GDB, helpful when something is not working right
+        },
+        {
+            "name": "NuLink",
+            "type": "cppdbg",
+            "debugServerArgs": "-f ../scripts/interface/nulink.cfg -f ../scripts/target/numicroM4.cfg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/template.elf",
+            "preLaunchTask": "Build",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "arm-none-eabi-gdb",
+            "miDebuggerArgs": "--cd=\"${workspaceFolder}/build\"",
+            "targetArchitecture": "arm",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "file template.elf"
+                },
+                {
+                    "text": "target remote localhost:3333"
+                },
+                {
+                    "text": "set mem inaccessible-by-default off"
+                },
+                {
+                    "text": "monitor reset init"
+                },
+                {
+                    "text": "monitor halt"
+                },
+                {
+                    // really ugly, but we have to nested-escape the absolute path:
+                    "text": "monitor flash write_image erase c:\\\\git\\\\m480-template\\\\build\\\\template.bin"
+                }
+            ]
+        }
+       
+    ]
+}

@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "make -j12",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "NuLinkOpenOCD",
+            "type": "shell",
+            "command": "openocd.exe -f ../scripts/interface/nulink.cfg -f ../scripts/target/numicroM4.cfg",
+            "presentation": {
+                "reveal": "always"
+            },
+            "options" :{
+                "cwd": "C:\\Program Files (x86)\\Nuvoton Tools\\OpenOCD\\bin\\"
+            },
+        },
+    ]
+}

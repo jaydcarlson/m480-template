@@ -1,0 +1,17 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "c:\\git\\smoothie\\build",
+            "binaryPath": "c:\\git\\smoothie\\build\\smoothie.elf",
+            "binaryArgs": []
+        }
+    ],
+    "files.associations": {
+        "numicro.h": "c",
+        "m480.h": "c",
+        "stdint.h": "c",
+        "icm42688p.h": "c",
+        "stdio.h": "c"
+    }
+}
