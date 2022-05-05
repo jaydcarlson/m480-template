@@ -43,6 +43,19 @@
             "showDevDebugOutput":"none",// Shows output of GDB, helpful when something is not working right
         },
         {
+            "name": "pyOCD",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "executable": "build/template.elf",
+            "servertype": "pyocd",
+            "targetId": "m487jidae", 
+            "gdbTarget": "localhost:5555",
+            "svdFile": "M481_v1.svd",
+            "preLaunchTask": "Build", // Set this to run a task from tasks.json before starting a debug session
+            "showDevDebugOutput":"none",// Shows output of GDB, helpful when something is not working right
+        },
+        {
             "name": "NuLink",
             "type": "cppdbg",
             "debugServerArgs": "-f ../scripts/interface/nulink.cfg -f ../scripts/target/numicroM4.cfg",
