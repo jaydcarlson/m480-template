@@ -6,7 +6,7 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}",
-            "executable": "build/template.elf",
+            "executable": "build/${workspaceFolderBasename}.elf",
             "servertype": "jlink",
             "device": "M487JIDAE",
             "preLaunchCommands": [
@@ -25,7 +25,7 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}",
-            "executable": "build/template.elf",
+            "executable": "build/${workspaceFolderBasename}.elf",
             "servertype": "external",
             "gdbTarget": "localhost:2331",
             "preLaunchCommands": [
@@ -47,7 +47,7 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}",
-            "executable": "build/template.elf",
+            "executable": "build/${workspaceFolderBasename}.elf",
             "servertype": "pyocd",
             "targetId": "m487jidae", 
             "gdbTarget": "localhost:5555",
@@ -60,7 +60,7 @@
             "type": "cppdbg",
             "debugServerArgs": "-f ../scripts/interface/nulink.cfg -f ../scripts/target/numicroM4.cfg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/template.elf",
+            "program": "${workspaceFolder}/build/${workspaceFolderBasename}.elf",
             "preLaunchTask": "Build",
             "args": [],
             "stopAtEntry": false,
@@ -94,7 +94,7 @@
                 },
                 {
                     // really ugly, but we have to nested-escape the absolute path:
-                    "text": "monitor flash write_image erase c:\\\\git\\\\m480-template\\\\build\\\\template.bin"
+                    "text": "monitor flash write_image erase c:\\\\git\\\\m480-template\\\\build\\\\${workspaceFolderBasename}.bin"
                 }
             ]
         }

@@ -104,7 +104,7 @@ void SystemInit (void)
     RTC->GPIOCTL1 &= ~(RTC_GPIOCTL1_CTLSEL4_Msk | RTC_GPIOCTL1_CTLSEL5_Msk |
                        RTC_GPIOCTL1_CTLSEL6_Msk | RTC_GPIOCTL1_CTLSEL7_Msk);
     CLK->APBCLK0 &= ~CLK_APBCLK0_RTCCKEN_Msk;
-    HXTInit();
+    // HXTInit();
 
 }
 /*** (C) COPYRIGHT 2016 Nuvoton Technology Corp. ***/

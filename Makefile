@@ -1,7 +1,7 @@
 ######################################
 # target
 ######################################
-TARGET = template
+TARGET ?= "template"
 
 
 ######################################
@@ -113,7 +113,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = Device/Nuvoton/M480/Source/GCC/gcc_arm.ld
+LDSCRIPT = Device/Nuvoton/M480/Source/GCC/M480xxDAE.ld
 
 # libraries
 LIBS = -lc -lm -lnosys 
