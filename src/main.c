@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "NuMicro.h"
+#include "usb_vendor.h"
 
 void SYS_Init(void)
 {
@@ -36,12 +37,17 @@ void SYS_Init(void)
     /* Enable IP clock */
     CLK_EnableModuleClock(FMCIDLE_MODULE);
     CLK_EnableModuleClock(ISP_MODULE);
+    CLK_EnableModuleClock(USBD_MODULE);
+
+    CLK_SetModuleClock(USBD_MODULE, CLK_CLKSEL0_USBSEL_RC48M, CLK_CLKDIV0_USB(1));
 
 }
 
 int main (void)
 {
     SYS_Init();
+
+    USB_init();
 
     while(1) {
 

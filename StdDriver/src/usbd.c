@@ -28,6 +28,8 @@ extern "C"
   @{
 */
 
+char stringBuffer[64];
+
 /* Global variables for Control Pipe */
 uint8_t g_usbd_SetupPacket[8] = {0ul};        /*!< Setup packet buffer */
 volatile uint8_t g_usbd_RemoteWakeupEn = 0ul; /*!< Remote wake up function enable flag */
@@ -57,6 +59,11 @@ CLASS_REQ g_usbd_pfnClassRequest         = NULL;    /*!< USB Class Request Funct
 SET_INTERFACE_REQ g_usbd_pfnSetInterface = NULL;    /*!< USB Set Interface Functional Pointer */
 SET_CONFIG_CB g_usbd_pfnSetConfigCallback = NULL;   /*!< USB Set configuration callback function pointer */
 uint32_t g_u32EpStallLock                = 0ul;       /*!< Bit map flag to lock specified EP when SET_FEATURE */
+
+// WinUSB string descriptor stuff
+static uint8_t msStringDesc[] = {
+		0x12, 0x03, 0x4D, 0x00, 0x53, 0x00, 0x46, 0x00, 0x54, 0x00, 0x31, 0x00, 0x30, 0x00, 0x30, 0x00, 0xEE, 0x00
+};
 
 /**
   * @brief      This function makes USBD module to be ready to use
@@ -266,18 +273,64 @@ void USBD_GetDescriptor(void)
     /* Get String Descriptor */
     case DESC_STRING:
     {
-        /* Get String Descriptor */
-        if(g_usbd_SetupPacket[2] < 4ul)
+        int index = g_usbd_SetupPacket[2];
+
+        if(index == 0xEE)
         {
-            if (u32Len > g_usbd_sInfo->gu8StringDesc[g_usbd_SetupPacket[2]][0])
+            if (u32Len > msStringDesc[0])
             {
-                u32Len = g_usbd_sInfo->gu8StringDesc[g_usbd_SetupPacket[2]][0];
+                u32Len = msStringDesc[0];
                 if ((u32Len % g_usbd_CtrlMaxPktSize) == 0ul)
                 {
                     g_usbd_CtrlInZeroFlag = (uint8_t)1ul;
                 }
             }
-            USBD_PrepareCtrlIn((uint8_t *)g_usbd_sInfo->gu8StringDesc[g_usbd_SetupPacket[2]], u32Len);
+            USBD_PrepareCtrlIn(msStringDesc, u32Len);
+            break;
+        }
+
+        /* Get String Descriptor */
+        if(g_usbd_sInfo->gu8StringDesc[index] != NULL)
+        {
+            uint8_t* str = g_usbd_sInfo->gu8StringDesc[index];
+            int stringLength = strlen(str);
+
+
+            memset(stringBuffer, 0, sizeof(stringBuffer));
+
+            int descriptorLen = 0;
+
+            if(index == 0)
+            {
+                // lang, copy bytes directly
+                descriptorLen = stringLength + 2;
+                stringBuffer[0] = descriptorLen;
+                stringBuffer[1] = DESC_STRING;
+                memcpy(&stringBuffer[2], g_usbd_sInfo->gu8StringDesc[index], 2);
+            } else {
+                descriptorLen = stringLength*2 + 2;
+                stringBuffer[0] = descriptorLen;
+                stringBuffer[1] = DESC_STRING;
+
+                // unpack UTF8 bytes into UTF16
+                for(int i = 0; i<stringLength; i++)
+                {
+                    stringBuffer[i*2 + 2] = g_usbd_sInfo->gu8StringDesc[index][i];
+                }
+
+            }
+            
+            if (u32Len > descriptorLen)
+            {
+                u32Len = descriptorLen;
+                if ((u32Len % g_usbd_CtrlMaxPktSize) == 0ul)
+                {
+                    g_usbd_CtrlInZeroFlag = (uint8_t)1ul;
+                }
+            }
+            USBD_PrepareCtrlIn((uint8_t *)stringBuffer, u32Len);
+
+
             break;
         }
         else

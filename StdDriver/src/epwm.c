@@ -137,6 +137,7 @@ uint32_t EPWM_ConfigOutputChannel(EPWM_T *epwm, uint32_t u32ChannelNum, uint32_t
     uint32_t u32EPWMClockSrc;
     uint32_t i;
     uint32_t u32Prescale = 1U, u32CNR = 0xFFFFU;
+    u32Frequency = u32Frequency << 1; // double the frequency, since we're doing up-down countinnng
 
     if(epwm == EPWM0)
     {
@@ -183,17 +184,23 @@ uint32_t EPWM_ConfigOutputChannel(EPWM_T *epwm, uint32_t u32ChannelNum, uint32_t
     /* every two channels share a prescaler */
     u32Prescale -= 1U;
     EPWM_SET_PRESCALER(epwm, u32ChannelNum, u32Prescale);
-    /* set EPWM to up counter type(edge aligned) and auto-reload mode */
-    (epwm)->CTL1 = ((epwm)->CTL1 & ~((EPWM_CTL1_CNTTYPE0_Msk << (u32ChannelNum << 1U))|((1UL << EPWM_CTL1_CNTMODE0_Pos) << u32ChannelNum)));
+    /* set EPWM to up-down counter type and auto-reload mode */
+    (epwm)->CTL1 = ((epwm)->CTL1 & ~((EPWM_CTL1_CNTTYPE0_Msk << (u32ChannelNum << 1U))|((1UL << EPWM_CTL1_CNTMODE0_Pos) << u32ChannelNum))) | (0x2 << (u32ChannelNum << 1U));
 
     u32CNR -= 1U;
     EPWM_SET_CNR(epwm, u32ChannelNum, u32CNR);
     EPWM_SET_CMR(epwm, u32ChannelNum, u32DutyCycle * (u32CNR + 1U) / 100U);
 
-    (epwm)->WGCTL0 = ((epwm)->WGCTL0 & ~((EPWM_WGCTL0_PRDPCTL0_Msk | EPWM_WGCTL0_ZPCTL0_Msk) << (u32ChannelNum << 1U))) | \
-                     ((uint32_t)EPWM_OUTPUT_HIGH << ((u32ChannelNum << 1U) + (uint32_t)EPWM_WGCTL0_ZPCTL0_Pos));
+    (epwm)->WGCTL0 = ((epwm)->WGCTL0 & ~((EPWM_WGCTL0_PRDPCTL0_Msk | EPWM_WGCTL0_ZPCTL0_Msk) << (u32ChannelNum << 1U)));
+                     
     (epwm)->WGCTL1 = ((epwm)->WGCTL1 & ~((EPWM_WGCTL1_CMPDCTL0_Msk | EPWM_WGCTL1_CMPUCTL0_Msk) << (u32ChannelNum << 1U))) | \
-                     ((uint32_t)EPWM_OUTPUT_LOW << ((u32ChannelNum << 1U) + (uint32_t)EPWM_WGCTL1_CMPUCTL0_Pos));
+                     ((uint32_t)EPWM_OUTPUT_LOW << ((u32ChannelNum << 1U) + (uint32_t)EPWM_WGCTL1_CMPUCTL0_Pos)) | \
+                     ((uint32_t)EPWM_OUTPUT_HIGH << ((u32ChannelNum << 1U) + (uint32_t)EPWM_WGCTL1_CMPDCTL0_Pos));
+
+    // (epwm)->WGCTL0 = ((epwm)->WGCTL0 & ~((EPWM_WGCTL0_PRDPCTL0_Msk | EPWM_WGCTL0_ZPCTL0_Msk) << (u32ChannelNum << 1U))) | \
+    //                  ((uint32_t)EPWM_OUTPUT_HIGH << ((u32ChannelNum << 1U) + (uint32_t)EPWM_WGCTL0_ZPCTL0_Pos));
+    // (epwm)->WGCTL1 = ((epwm)->WGCTL1 & ~((EPWM_WGCTL1_CMPDCTL0_Msk | EPWM_WGCTL1_CMPUCTL0_Msk) << (u32ChannelNum << 1U))) | \
+    //                  ((uint32_t)EPWM_OUTPUT_LOW << ((u32ChannelNum << 1U) + (uint32_t)EPWM_WGCTL1_CMPUCTL0_Pos));
 
     return(i);
 }
